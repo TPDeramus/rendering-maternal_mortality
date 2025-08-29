@@ -1,0 +1,11 @@
+CDC_Maternal_Mortality
+https://www.cdc.gov/nchs/maternal-mortality/mmr-2018-2022-state-data.pdf
+
+Britannica_Abortion_Laws
+https://www.britannica.com/science/US-abortion-rights-by-state-2236312
+
+APNews_Abortion_Laws
+https://apnews.com/article/abortion-bills-murder-oklahoma-missouri-courts-trump-0a8883ae0cb8d84b13efdb209fab9e47
+
+NCSL_Abortion_Laws
+https://www.ncsl.org/health/state-abortion-laws-protections-and-restrictions
