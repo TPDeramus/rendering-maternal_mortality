@@ -47,3 +47,18 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# Micromamba environment folders
+bin/
+conda-meta/
+etc/
+fonts/
+include/
+lib/
+libexec/
+man/
+sbin/
+share/
+ssl/
+var/
+x86_64-conda-linux-gnu/
