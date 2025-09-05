@@ -1,0 +1,57 @@
+---
+title: "Quarto_Document_for_maternal_mortality_piloting"
+format: html
+---
+
+# Scratch Space for testing Data loading
+
+## Load relevant libraries
+
+```{r}
+library(tidyverse)
+library(tabulapdf)
+library(usmap)
+library(shiny)
+
+# set Java memory limit to 600 MB (optional)
+options(java.parameters = "-Xmx600m")
+```
+
+## Load Data with PDF table parser
+
+```{r}
+
+f1 <- "https://www.cdc.gov/nchs/maternal-mortality/mmr-2018-2022-state-data.pdf"
+
+corrected_columns = c("State","Births","Deaths","Maternal_Mortality_100k","CI_Lower_95","CI_Upper_95")
+
+# extract table from first page of example PDF
+tab <- extract_tables(f1)
+
+# clean and convert the extracted tables
+p1 <- tab[[1]] |> slice(-(1:3)) |> select(-2)
+p2 <- tab[[2]] |> rbind(colnames(tab[[2]]))
+p2 <- rbind(p2[nrow(p2), ], p2[-nrow(p2), ])
+
+pList <- list(p1,p2)
+usmaternal_mortality <- do.call(rbind, lapply(pList, setNames, corrected_columns)) |>
+    mutate_all(~gsub(",", "", .)) |>
+    mutate(across(-State, as.numeric))
+
+
+# Extract and print the minumum for re-computing the mortality rates:
+substr(as.character(min(usmaternal_mortality$Births)), 1, nchar(as.character(min(usmaternal_mortality$Births))))
+
+if (as.numeric(substr(as.character(min(usmaternal_mortality$Births)), 2, 2)) >= 5) {
+   mortality_ref <- as.numeric(str_pad(paste0(substr(as.character(min(usmaternal_mortality$Births)), 1, 1),5), width = nchar(as.character(min(usmaternal_mortality$Births))), side = "right", pad = "0"))
+
+} else {
+       mortality_ref <- as.numeric(str_pad(substr(as.character(min(usmaternal_mortality$Births)), 1, 1), width = nchar(as.character(min(usmaternal_mortality$Births))), side = "right", pad = "0"))
+}
+
+cat(paste0("The non-standard baseline for maternal mortality rate is per ", as.character(mortality_ref), " live births.\n",
+"This is due to ", usmaternal_mortality |> filter(Births == min(Births)) |> pull(State), "'s ", as.character(usmaternal_mortality |> filter(Births == min(Births)) |> pull(Births))," births from 2018-2022.\n"))
+
+usmaternal_mortality <- usmaternal_mortality |> mutate(mmr_standard = (Deaths/Births)*100000, mmr_adjusted = (Deaths/Births)*mortality_ref)  |> select(-starts_with("CI"))
+
+```
